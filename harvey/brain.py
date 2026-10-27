@@ -39,7 +39,7 @@ _NON_RETRYABLE_PATTERNS = (
 )
 
 
-PROVIDER_LABELS = {"claude": "Claude", "codex": "Codex"}
+PROVIDER_LABELS = {"claude": "Claude", "codex": "Codex", "gemini": "Gemini"}
 
 # Settings key holding the brain's last health transition, for `harvey
 # status` and the dashboard: {"provider", "status": "ok"|"paused", "reason",
@@ -137,6 +137,12 @@ class Brain:
         PROVIDER_RECHECK_SECONDS, so a persistent problem doesn't start
         runtimes every heartbeat.
         """
+        if self.provider == "gemini":
+            import os
+
+            if not os.getenv("GEMINI_API_KEY", "").strip():
+                return "GEMINI_API_KEY is missing. Add it to your local .env file."
+            return ""
         if self.provider != "codex":
             return await self._claude_preflight()
         from harvey.codex import CodexError
@@ -262,6 +268,45 @@ class Brain:
         ``agent``/``task`` label the call in the usage_events ledger so the
         dashboard can attribute tokens and cost to specific work.
         """
+        if self.provider == "gemini":
+            from harvey.gemini import GeminiError, generate_content_with_usage
+
+            started = time.monotonic()
+            try:
+                result, input_tokens, output_tokens = await generate_content_with_usage(
+                    prompt, model=self.model, timeout=timeout
+                )
+            except GeminiError as e:
+                logger.error("Gemini call failed: %s", e)
+                return ""
+
+            duration_ms = max(0, int((time.monotonic() - started) * 1000))
+            # Usage accounting must never break the response path.
+            try:
+                await self.state.increment_usage(provider="gemini")
+            except Exception as e:
+                logger.warning("Failed to record Gemini usage counter: %s", e)
+            try:
+                label = session_id or ""
+                inferred_agent = agent
+                if not inferred_agent and label.startswith("harvey-"):
+                    inferred_agent = label[len("harvey-"):].split("-")[0]
+                await self.state.record_usage_event(
+                    agent=inferred_agent,
+                    task=task or label,
+                    session_id=label,
+                    model=self.model or "",
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    duration_ms=duration_ms,
+                    num_turns=1,
+                    source="gemini_api",
+                    provider="gemini",
+                )
+            except Exception as e:
+                logger.warning("Failed to record Gemini usage event: %s", e)
+            return result
+
         if self.provider == "codex":
             return await self._think_codex(
                 prompt, session_id=session_id, timeout=timeout,

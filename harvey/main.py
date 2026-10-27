@@ -28,6 +28,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("harvey")
 
+# HTTPX request logs can include sensitive query parameters such as API keys.
+# Keep Harvey's own logs while suppressing verbose third-party request URLs.
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("httpcore").setLevel(logging.WARNING)
+
 # Backoff for consecutive failed cycles: 60s, 120s, 240s, ... capped at 15 min
 ERROR_BACKOFF_BASE = 60
 ERROR_BACKOFF_CAP = 900
