@@ -7,7 +7,7 @@ name: tests
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, feature/windows-gemini]
 
 permissions:
   contents: read

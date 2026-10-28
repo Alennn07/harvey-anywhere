@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "harvey"
 version = "0.3.0"
-description = "Autonomous AI sales agent. Always Be Closing."
+description = "Open-source AI sales agent with multi-provider support, including Google Gemini."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
-keywords = ["sales", "ai-agent", "cold-email", "prospecting", "autonomous-agent", "claude"]
+keywords = ["sales", "ai-agent", "cold-email", "prospecting", "autonomous-agent", "claude", "gemini", "open-source", "windows"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -41,9 +41,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ethanplusai/harvey"
-Issues = "https://github.com/ethanplusai/harvey/issues"
-Changelog = "https://github.com/ethanplusai/harvey/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/Alennn07/harvey-anywhere"
+Issues = "https://github.com/Alennn07/harvey-anywhere/issues"
+Changelog = "https://github.com/Alennn07/harvey-anywhere/blob/feature/windows-gemini/CHANGELOG.md"
 
 [project.scripts]
 harvey = "harvey.cli:main"
