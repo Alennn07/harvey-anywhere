@@ -226,3 +226,8 @@ This is an independent community project and is not an official Google, Anthropi
 ## License
 
 Harvey Anywhere retains the license included in the repository. See [LICENSE](LICENSE) for the applicable terms and attribution requirements.
+
+### Email warmup
+
+Harvey supports TrulyInbox warmup integration. Learn more: https://trulyinbox.com/?via=harvey
+
